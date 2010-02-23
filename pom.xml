@@ -23,7 +23,7 @@
   	<dependency>
   		<groupId>com.sforce</groupId>
   		<artifactId>salesforce-client</artifactId>
-  		<version>18.0-SNAPSHOT</version>
+  		<version>18.0</version>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
