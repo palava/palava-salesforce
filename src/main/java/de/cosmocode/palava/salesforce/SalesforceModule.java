@@ -36,7 +36,7 @@ public final class SalesforceModule implements Module {
     public void configure(Binder binder) {
         binder.bind(SalesforceService.class).to(DefaultSalesforceService.class).in(Singleton.class);
         binder.bind(Soap.class).toProvider(SalesforceService.class);
-        binder.bind(SalesforceBatchService.class).to(SoapBatchService.class).in(Singleton.class);
+        binder.bind(SalesforceBatchService.class).to(DefaultSalesforceBatchService.class).in(Singleton.class);
     }
 
 }

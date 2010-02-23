@@ -22,9 +22,9 @@ package de.cosmocode.palava.salesforce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class DefaultSalesforceBatchService extends AbstractSalesforceBatchServiceTest {
+public final class DefaultSalesforceBatchServiceTest extends AbstractSalesforceBatchServiceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceBatchService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceBatchServiceTest.class);
 
     @Override
     public SalesforceBatchService unit() {

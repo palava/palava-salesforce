@@ -30,12 +30,25 @@ import com.sforce.soap.enterprise.Soap;
 public interface SalesforceService extends Provider<Soap> {
 
     /**
-     * Connects to the Salesforce SOAP API or returns
-     * an already connected {@link Soap} instance.
+     * Connects to the Salesforce SOAP API.
+     * <p>
+     *   <strong>Note</strong>: If you want to reuse
+     *   an already connected soap instance, use {@link SalesforceService#get()}.
+     * </p>
      * 
      * @return a {@link Soap} used to manage API calls.
      * @throws SalesforceException if connect failed
      */
     Soap connect() throws SalesforceException;
+    
+    /**
+     * Provides a Soap instance which will be cached
+     * for future requests. If there is no connection
+     * in progress or the cached version went invalid,
+     * a new one will replace it.
+     * 
+     * @return a Soap instance
+     */
+    Soap get();
     
 }

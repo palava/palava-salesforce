@@ -43,20 +43,24 @@ import com.sforce.soap.enterprise.UpsertResult;
 import com.sforce.soap.enterprise.sobject.SObject;
 
 /**
- * Default implementation of the {@link SalesforceBatchService} interface
- * using the Saleforce.com API.
+ * Default implementation of the {@link SalesforceBatchService} interface.
+ * 
+ * <p>
+ *   Note: This implementation is threadsafe as long as the bound soap provider
+ *   is threadsafe.
+ * </p>
  *
  * @author Willi Schoenborn
  */
-public final class SoapBatchService implements SalesforceBatchService {
+final class DefaultSalesforceBatchService implements SalesforceBatchService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SoapBatchService.class);
-
-    private Provider<Soap> provider;
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceBatchService.class);
     
+    private final Provider<Soap> salesforce;
+
     @Inject
-    public SoapBatchService(Provider<Soap> provider) {
-        this.provider = Preconditions.checkNotNull(provider, "Provider");
+    public DefaultSalesforceBatchService(Provider<Soap> provider) {
+        this.salesforce = Preconditions.checkNotNull(provider, "Provider");
     }
     
     @Override
@@ -66,7 +70,9 @@ public final class SoapBatchService implements SalesforceBatchService {
         final List<SaveResult> results;
         
         try {
-            results = provider.get().create(objects);
+            results = salesforce.get().create(objects);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
             throw new SalesforceException(e);
         } catch (InvalidSObjectFault e) {
@@ -100,7 +106,9 @@ public final class SoapBatchService implements SalesforceBatchService {
         final List<SaveResult> results;
         
         try {
-            results = provider.get().update(objects);
+            results = salesforce.get().update(objects);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
             throw new SalesforceException(e);
         } catch (InvalidSObjectFault e) {
@@ -135,7 +143,7 @@ public final class SoapBatchService implements SalesforceBatchService {
         final List<UpsertResult> results;
         
         try {
-            results = provider.get().upsert(Salesforce.EXTERNAL_IDENTIFIER, objects);
+            results = salesforce.get().upsert(Salesforce.EXTERNAL_IDENTIFIER, objects);
         } catch (InvalidFieldFault e) {
             throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
@@ -182,7 +190,7 @@ public final class SoapBatchService implements SalesforceBatchService {
         final List<DeleteResult> results;
         
         try {
-            results = provider.get().delete(Arrays.asList(identifiers));
+            results = salesforce.get().delete(Arrays.asList(identifiers));
         } catch (UnexpectedErrorFault e) {
             throw new SalesforceException(e);
         }
@@ -197,7 +205,6 @@ public final class SoapBatchService implements SalesforceBatchService {
             }
             throw new SalesforceException(errors);
         }
-        
     }
 
     @Override

@@ -59,7 +59,7 @@ public final class Salesforce {
         
         @Override
         public String apply(SObject from) {
-            return from.getId().getValue();
+            return from.getId();
         }
         
     };
