@@ -17,32 +17,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.cosmocode.palava.salesforce;
+package de.cosmocode.palava.salesforce.sync;
 
-import org.easymock.EasyMock;
-
-import com.google.inject.Provider;
-import com.sforce.soap.enterprise.Soap;
+import de.cosmocode.palava.model.base.EntityBase;
 
 /**
- * Tests {@link DefaultBatchService}.
+ * 
  *
  * @author Willi Schoenborn
+ * @param <T>
  */
-public final class DefaultSalesforceBatchServiceTest extends AbstractSalesforceBatchServiceTest {
+public interface SalesforceSyncTask<T extends EntityBase> extends Runnable {
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @return a string representation of this task including the entity being sync'd
+     */
     @Override
-    public BatchService unit() {
-        final Soap soap = EasyMock.createMock("soap", Soap.class);
-        EasyMock.replay(soap);
-        return new DefaultBatchService(new Provider<Soap>() {
-            
-            @Override
-            public Soap get() {
-                return soap;
-            }
-            
-        });
-    }
-
+    String toString();
+    
 }

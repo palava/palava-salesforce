@@ -35,7 +35,10 @@ import com.sforce.soap.enterprise.DeleteResult;
 import com.sforce.soap.enterprise.Error;
 import com.sforce.soap.enterprise.InvalidFieldFault;
 import com.sforce.soap.enterprise.InvalidIdFault;
+import com.sforce.soap.enterprise.InvalidQueryLocatorFault;
 import com.sforce.soap.enterprise.InvalidSObjectFault;
+import com.sforce.soap.enterprise.MalformedQueryFault;
+import com.sforce.soap.enterprise.QueryResult;
 import com.sforce.soap.enterprise.SaveResult;
 import com.sforce.soap.enterprise.Soap;
 import com.sforce.soap.enterprise.UnexpectedErrorFault;
@@ -43,7 +46,7 @@ import com.sforce.soap.enterprise.UpsertResult;
 import com.sforce.soap.enterprise.sobject.SObject;
 
 /**
- * Default implementation of the {@link SalesforceBatchService} interface.
+ * Default implementation of the {@link BatchService} interface.
  * 
  * <p>
  *   Note: This implementation is threadsafe as long as the bound soap provider
@@ -52,14 +55,14 @@ import com.sforce.soap.enterprise.sobject.SObject;
  *
  * @author Willi Schoenborn
  */
-final class DefaultSalesforceBatchService implements SalesforceBatchService {
+final class DefaultBatchService implements BatchService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceBatchService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultBatchService.class);
     
     private final Provider<Soap> provider;
 
     @Inject
-    public DefaultSalesforceBatchService(Provider<Soap> provider) {
+    public DefaultBatchService(Provider<Soap> provider) {
         this.provider = Preconditions.checkNotNull(provider, "Provider");
     }
     
@@ -219,6 +222,27 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
     public void delete(String identifier) {
         Preconditions.checkNotNull(identifier, "Identifier");
         delete(new String[] {identifier});
+    }
+    
+    @Override
+    public QueryResult execute(String query) {
+        Preconditions.checkNotNull(query, "Query");
+        try {
+            LOG.debug("Executing query '{}' against Salesforce", query);
+            return provider.get().query(query);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidIdFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidQueryLocatorFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidSObjectFault e) {
+            throw new SalesforceException(e);
+        } catch (MalformedQueryFault e) {
+            throw new SalesforceException(e);
+        } catch (UnexpectedErrorFault e) {
+            throw new SalesforceException(e);
+        }
     }
 
 }

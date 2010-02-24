@@ -21,6 +21,7 @@ package de.cosmocode.palava.salesforce;
 
 import java.util.List;
 
+import com.sforce.soap.enterprise.QueryResult;
 import com.sforce.soap.enterprise.sobject.SObject;
 
 import de.cosmocode.palava.core.Service;
@@ -31,7 +32,7 @@ import de.cosmocode.palava.core.Service;
  *
  * @author Willi Schoenborn
  */
-public interface SalesforceBatchService extends Service {
+public interface BatchService extends Service {
 
     /**
      * Creates a set of objects in Salesforce.
@@ -127,5 +128,18 @@ public interface SalesforceBatchService extends Service {
      * @throws SalesforceException if deletion failed
      */
     void delete(String identifier);
+    
+
+    /**
+     * Executes a query against Salesforce and returns
+     * the result. All Soap/Salesforce-specific exceptions
+     * will be wrapped inside a {@link SalesforceException}.
+     * 
+     * @param query the query string
+     * @return the {@link QueryResult} for the given query
+     * @throws SalesforceException if an error occurs
+     * @throws NullPointerException if query is null
+     */
+    QueryResult execute(String query);
     
 }

@@ -29,14 +29,16 @@ import com.sforce.soap.enterprise.sobject.SObject;
 import de.cosmocode.junit.UnitProvider;
 
 /**
- * Tests {@link SalesforceBatchService} implementations.
+ * Tests {@link BatchService} implementations.
+ * 
+ * TODO add test cases
  *
  * @author Willi Schoenborn
  */
-public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider<SalesforceBatchService> {
+public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider<BatchService> {
 
     /**
-     * Tests {@link SalesforceBatchService#create(List)} with a null list.
+     * Tests {@link BatchService#create(List)} with a null list.
      */
     @Test(expected = NullPointerException.class)
     public void createListNull() {
@@ -45,7 +47,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
     
     /**
-     * Tests {@link SalesforceBatchService#create(List)} with an empty list.
+     * Tests {@link BatchService#create(List)} with an empty list.
      */
     @Test(expected = IllegalArgumentException.class)
     public void createListEmpty() {
@@ -53,7 +55,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
     
     /**
-     * Tests {@link SalesforceBatchService#create(SObject)} with a null object.
+     * Tests {@link BatchService#create(SObject)} with a null object.
      */
     @Test(expected = NullPointerException.class)
     public void createNull() {
@@ -62,7 +64,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
 
     /**
-     * Tests {@link SalesforceBatchService#update(List)} with a null list.
+     * Tests {@link BatchService#update(List)} with a null list.
      */
     @Test(expected = NullPointerException.class)
     public void updateListNull() {
@@ -71,7 +73,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
     
     /**
-     * Tests {@link SalesforceBatchService#update(List)} with an empty list.
+     * Tests {@link BatchService#update(List)} with an empty list.
      */
     @Test(expected = IllegalArgumentException.class)
     public void updateListEmpty() {
@@ -79,7 +81,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
 
     /**
-     * Tests {@link SalesforceBatchService#update(SObject)} with a null object.
+     * Tests {@link BatchService#update(SObject)} with a null object.
      */
     @Test(expected = NullPointerException.class)
     public void updateNull() {
@@ -88,7 +90,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
 
     /**
-     * Tests {@link SalesforceBatchService#upsert(List)} with a null list.
+     * Tests {@link BatchService#upsert(List)} with a null list.
      */
     @Test(expected = NullPointerException.class)
     public void upsertListNull() {
@@ -97,7 +99,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
     
     /**
-     * Tests {@link SalesforceBatchService#upsert(List)} with an empty list.
+     * Tests {@link BatchService#upsert(List)} with an empty list.
      */
     @Test(expected = IllegalArgumentException.class)
     public void upsertListEmpty() {
@@ -105,7 +107,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
 
     /**
-     * Tests {@link SalesforceBatchService#upsert(SObject)} with a null object.
+     * Tests {@link BatchService#upsert(SObject)} with a null object.
      */
     @Test(expected = NullPointerException.class)
     public void upsertNull() {
@@ -114,7 +116,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
 
     /**
-     * Tests {@link SalesforceBatchService#delete(List)} with a null list.
+     * Tests {@link BatchService#delete(List)} with a null list.
      */
     @Test(expected = NullPointerException.class)
     public void deleteListNull() {
@@ -123,7 +125,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
     
     /**
-     * Tests {@link SalesforceBatchService#delete(List)} with an empty list.
+     * Tests {@link BatchService#delete(List)} with an empty list.
      */
     @Test(expected = IllegalArgumentException.class)
     public void deleteListEmpty() {
@@ -148,7 +150,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
     
     /**
-     * Tests {@link SalesforceBatchService#delete(SObject)} with a null list.
+     * Tests {@link BatchService#delete(SObject)} with a null list.
      */
     @Test(expected = NullPointerException.class)
     public void deleteObjectNull() {
@@ -157,7 +159,7 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
     }
 
     /**
-     * Tests {@link SalesforceBatchService#delete(String)} with a null list.
+     * Tests {@link BatchService#delete(String)} with a null list.
      */
     @Test(expected = NullPointerException.class)
     public void deleteStringNull() {
@@ -165,6 +167,12 @@ public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider
         unit().delete(string);
     }
     
-    // TODO add missing test cases
+    /**
+     * Tests {@link BatchService#execute(String)} with a null query.
+     */
+    @Test(expected = NullPointerException.class)
+    public void executeNull() {
+        unit().execute(null);
+    }
 
 }

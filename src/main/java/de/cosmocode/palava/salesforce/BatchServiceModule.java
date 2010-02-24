@@ -19,30 +19,21 @@
 
 package de.cosmocode.palava.salesforce;
 
-import org.easymock.EasyMock;
-
-import com.google.inject.Provider;
-import com.sforce.soap.enterprise.Soap;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.Singleton;
 
 /**
- * Tests {@link DefaultBatchService}.
+ * Binds all default implementations in this package
+ * and corresponding providers.
  *
  * @author Willi Schoenborn
  */
-public final class DefaultSalesforceBatchServiceTest extends AbstractSalesforceBatchServiceTest {
+public final class BatchServiceModule implements Module {
 
     @Override
-    public BatchService unit() {
-        final Soap soap = EasyMock.createMock("soap", Soap.class);
-        EasyMock.replay(soap);
-        return new DefaultBatchService(new Provider<Soap>() {
-            
-            @Override
-            public Soap get() {
-                return soap;
-            }
-            
-        });
+    public void configure(Binder binder) {
+        binder.bind(BatchService.class).to(DefaultBatchService.class).in(Singleton.class);
     }
 
 }
