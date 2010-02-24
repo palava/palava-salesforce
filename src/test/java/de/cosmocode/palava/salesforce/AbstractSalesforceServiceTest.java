@@ -19,20 +19,58 @@
 
 package de.cosmocode.palava.salesforce;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import com.sforce.soap.enterprise.Soap;
+import com.sforce.soap.enterprise.UnexpectedErrorFault;
 
 import de.cosmocode.junit.UnitProvider;
 
 /**
- * 
+ * Abstract test suite for {@link SalesforceService}s.
  *
  * @author Willi Schoenborn
  */
 public abstract class AbstractSalesforceServiceTest implements UnitProvider<SalesforceService> {
 
+    /**
+     * Tests {@link SalesforceService#connect()}.
+     */
     @Test
     public void connect() {
-        
+        unit().connect();
+    }
+    
+    /**
+     * Tests {@link SalesforceService#get()}.
+     */
+    @Test
+    public void get() {
+        unit().get();
+    }
+    
+    /**
+     * Tests {@link SalesforceService#get()} to make sure
+     * the soap instance gets cached.
+     */
+    @Test
+    public void getSame() {
+        final SalesforceService unit = unit();
+        Assert.assertSame(unit.get(), unit.get());
+    }
+    
+    /**
+     * Tests reconnect functionality of {@link SalesforceService#get()}.
+     * 
+     * @throws UnexpectedErrorFault if logout failed
+     */
+    @Test
+    public void getReconnect() throws UnexpectedErrorFault {
+        final SalesforceService unit = unit();
+        final Soap soap = unit.get();
+        soap.logout();
+        Assert.assertNotSame(soap, unit.get());
     }
     
     // TODO add test cases

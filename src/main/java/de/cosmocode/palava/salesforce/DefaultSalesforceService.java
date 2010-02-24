@@ -107,7 +107,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
     }
 
     @Override
-    public synchronized void initialize() throws LifecycleException {
+    public void initialize() throws LifecycleException {
         try {
             soap = connect();
         } catch (SalesforceException e) {
@@ -117,7 +117,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
     
     @Override
     public Soap connect() throws SalesforceException {
-        LOG.info("Connecting to Salesforce");
+        LOG.info("Connecting to Salesforce using {}", wsdl.toExternalForm());
         final SforceService service = new SforceService(wsdl, Salesforce.SERVICE_NAME);
         final Soap endpoint = service.getSoap();
         
@@ -174,14 +174,14 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
             soap.getServerTimestamp();
             return soap;
         } catch (UnexpectedErrorFault e) {
-            LOG.warn("Soap connection went invalid.", e);
+            LOG.warn("Soap connection went invalid because of {}", e.getMessage());
             soap = connect();
             return get();
         }
     }
     
     @Override
-    public synchronized void dispose() throws LifecycleException {
+    public void dispose() throws LifecycleException {
         try {
             LOG.info("Logging out from Salesforce");
             soap.logout();

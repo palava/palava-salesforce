@@ -19,7 +19,12 @@
 
 package de.cosmocode.palava.salesforce;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
+
+import com.sforce.soap.enterprise.sobject.SObject;
 
 import de.cosmocode.junit.UnitProvider;
 
@@ -30,9 +35,134 @@ import de.cosmocode.junit.UnitProvider;
  */
 public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider<SalesforceBatchService> {
 
+    /**
+     * Tests {@link SalesforceBatchService#create(List)} with a null list.
+     */
     @Test(expected = NullPointerException.class)
     public void createListNull() {
-        
+        final List<SObject> list = null;
+        unit().create(list);
+    }
+    
+    /**
+     * Tests {@link SalesforceBatchService#create(List)} with an empty list.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void createListEmpty() {
+        unit().create(Collections.<SObject>emptyList());
+    }
+    
+    /**
+     * Tests {@link SalesforceBatchService#create(SObject)} with a null object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void createNull() {
+        final SObject object = null;
+        unit().create(object);
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#update(List)} with a null list.
+     */
+    @Test(expected = NullPointerException.class)
+    public void updateListNull() {
+        final List<SObject> list = null;
+        unit().update(list);
+    }
+    
+    /**
+     * Tests {@link SalesforceBatchService#update(List)} with an empty list.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void updateListEmpty() {
+        unit().update(Collections.<SObject>emptyList());
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#update(SObject)} with a null object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void updateNull() {
+        final SObject object = null;
+        unit().update(object);
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#upsert(List)} with a null list.
+     */
+    @Test(expected = NullPointerException.class)
+    public void upsertListNull() {
+        final List<SObject> list = null;
+        unit().upsert(list);
+    }
+    
+    /**
+     * Tests {@link SalesforceBatchService#upsert(List)} with an empty list.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void upsertListEmpty() {
+        unit().upsert(Collections.<SObject>emptyList());
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#upsert(SObject)} with a null object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void upsertNull() {
+        final SObject object = null;
+        unit().upsert(object);
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#delete(List)} with a null list.
+     */
+    @Test(expected = NullPointerException.class)
+    public void deleteListNull() {
+        final List<SObject> list = null;
+        unit().delete(list);
+    }
+    
+    /**
+     * Tests {@link SalesforceBatchService#delete(List)} with an empty list.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteListEmpty() {
+        unit().delete(Collections.<SObject>emptyList());
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#delete(String[]))} with a null array.
+     */
+    @Test(expected = NullPointerException.class)
+    public void deleteArrayNull() {
+        final String[] array = null;
+        unit().delete(array);
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#delete(String[]))} with a null array.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteArrayEmpty() {
+        unit().delete(new String[0]);
+    }
+    
+    /**
+     * Tests {@link SalesforceBatchService#delete(SObject)} with a null list.
+     */
+    @Test(expected = NullPointerException.class)
+    public void deleteObjectNull() {
+        final SObject object = null;
+        unit().delete(object);
+    }
+
+    /**
+     * Tests {@link SalesforceBatchService#delete(String)} with a null list.
+     */
+    @Test(expected = NullPointerException.class)
+    public void deleteStringNull() {
+        final String string = null;
+        unit().delete(string);
     }
     
     // TODO add missing test cases

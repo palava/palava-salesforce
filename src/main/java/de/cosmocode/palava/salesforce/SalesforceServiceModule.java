@@ -19,44 +19,23 @@
 
 package de.cosmocode.palava.salesforce;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.After;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.Singleton;
+import com.sforce.soap.enterprise.Soap;
 
 /**
- * Tests {@link DefaultSalesforceService}.
+ * Binds all default implementations in this package
+ * and corresponding providers.
  *
  * @author Willi Schoenborn
  */
-public final class DefaultSalesforceServiceTest extends AbstractSalesforceServiceTest {
+public final class SalesforceServiceModule implements Module {
 
-    private DefaultSalesforceService unit;
-    
     @Override
-    public SalesforceService unit() {
-        unit = new DefaultSalesforceService(
-            Class.class.getResource("/enterprise.wsdl"),
-            "sarnowski@cosmocode.de",
-            "5ucco2Mela?",
-            "X7jbpKwXL6oSLeg6sS5tWYAE",
-            30, TimeUnit.MINUTES
-        );
-        
-        unit.initialize();
-        return unit;
-    }
-    
-    /**
-     * Dispose the current unit after each test.
-     */
-    @After
-    public void after() {
-        if (unit == null) {
-            return;
-        } else {
-            unit.dispose();
-            unit = null;
-        }
+    public void configure(Binder binder) {
+        binder.bind(SalesforceService.class).to(DefaultSalesforceService.class).in(Singleton.class);
+        binder.bind(Soap.class).toProvider(SalesforceService.class);
     }
 
 }

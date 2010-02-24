@@ -56,11 +56,11 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceBatchService.class);
     
-    private final Provider<Soap> salesforce;
+    private final Provider<Soap> provider;
 
     @Inject
     public DefaultSalesforceBatchService(Provider<Soap> provider) {
-        this.salesforce = Preconditions.checkNotNull(provider, "Provider");
+        this.provider = Preconditions.checkNotNull(provider, "Provider");
     }
     
     @Override
@@ -70,7 +70,7 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
         final List<SaveResult> results;
         
         try {
-            results = salesforce.get().create(objects);
+            results = provider.get().create(objects);
         } catch (InvalidFieldFault e) {
             throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
@@ -106,7 +106,7 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
         final List<SaveResult> results;
         
         try {
-            results = salesforce.get().update(objects);
+            results = provider.get().update(objects);
         } catch (InvalidFieldFault e) {
             throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
@@ -143,7 +143,7 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
         final List<UpsertResult> results;
         
         try {
-            results = salesforce.get().upsert(Salesforce.EXTERNAL_IDENTIFIER, objects);
+            results = provider.get().upsert(Salesforce.EXTERNAL_IDENTIFIER, objects);
         } catch (InvalidFieldFault e) {
             throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
@@ -187,10 +187,13 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
     
     @Override
     public void delete(String[] identifiers) {
+        Preconditions.checkNotNull(identifiers, "Identifiers");
+        Preconditions.checkArgument(identifiers.length > 0, "Identifiers must not be empty");
+        
         final List<DeleteResult> results;
         
         try {
-            results = salesforce.get().delete(Arrays.asList(identifiers));
+            results = provider.get().delete(Arrays.asList(identifiers));
         } catch (UnexpectedErrorFault e) {
             throw new SalesforceException(e);
         }
@@ -214,6 +217,7 @@ final class DefaultSalesforceBatchService implements SalesforceBatchService {
     
     @Override
     public void delete(String identifier) {
+        Preconditions.checkNotNull(identifier, "Identifier");
         delete(new String[] {identifier});
     }
 

@@ -22,7 +22,6 @@ package de.cosmocode.palava.salesforce;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
-import com.sforce.soap.enterprise.Soap;
 
 /**
  * Binds all default implementations in this package
@@ -30,12 +29,10 @@ import com.sforce.soap.enterprise.Soap;
  *
  * @author Willi Schoenborn
  */
-public final class SalesforceModule implements Module {
+public final class SalesforceBatchServiceModule implements Module {
 
     @Override
     public void configure(Binder binder) {
-        binder.bind(SalesforceService.class).to(DefaultSalesforceService.class).in(Singleton.class);
-        binder.bind(Soap.class).toProvider(SalesforceService.class);
         binder.bind(SalesforceBatchService.class).to(DefaultSalesforceBatchService.class).in(Singleton.class);
     }
 

@@ -19,17 +19,30 @@
 
 package de.cosmocode.palava.salesforce;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.easymock.EasyMock;
 
+import com.google.inject.Provider;
+import com.sforce.soap.enterprise.Soap;
+
+/**
+ * Tests {@link DefaultSalesforceBatchService}.
+ *
+ * @author Willi Schoenborn
+ */
 public final class DefaultSalesforceBatchServiceTest extends AbstractSalesforceBatchServiceTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceBatchServiceTest.class);
 
     @Override
     public SalesforceBatchService unit() {
-        // TODO Auto-generated method stub
-        return null;
+        final Soap soap = EasyMock.createMock("soap", Soap.class);
+        EasyMock.replay(soap);
+        return new DefaultSalesforceBatchService(new Provider<Soap>() {
+            
+            @Override
+            public Soap get() {
+                return soap;
+            }
+            
+        });
     }
 
 }
