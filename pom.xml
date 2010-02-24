@@ -9,6 +9,9 @@
   <artifactId>palava-salesforce</artifactId>
   <name>Palava Salesforce</name>
   <version>0.1-SNAPSHOT</version>
+  <scm>
+  	<url>scm:svn:https://palava.svn.cosmocode.de/palava-salesforce/trunk</url>
+  </scm>
   <dependencies>
   	<dependency>
   		<groupId>de.cosmocode.palava</groupId>
