@@ -35,7 +35,7 @@ import de.cosmocode.junit.UnitProvider;
  *
  * @author Willi Schoenborn
  */
-public abstract class AbstractSalesforceBatchServiceTest implements UnitProvider<BatchService> {
+public abstract class AbstractBatchServiceTest implements UnitProvider<BatchService> {
 
     /**
      * Tests {@link BatchService#create(List)} with a null list.

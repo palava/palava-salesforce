@@ -19,8 +19,9 @@
 
 package de.cosmocode.palava.salesforce.sync;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.ExecutorService;
+
+import org.easymock.EasyMock;
 
 /**
  * Tests {@link DefaultSyncService}.
@@ -29,12 +30,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class DefaultSyncServiceTest extends AbstractSyncServiceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSyncServiceTest.class);
-
     @Override
     public SyncService unit() {
-        // TODO Auto-generated method stub
-        return null;
+        final ExecutorService service = EasyMock.createMock("service", ExecutorService.class);
+        EasyMock.replay(service);
+        return new DefaultSyncService(service);
     }
 
 }

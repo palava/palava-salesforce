@@ -29,6 +29,8 @@ import de.cosmocode.junit.UnitProvider;
 
 /**
  * Abstract test suite for {@link SalesforceService}s.
+ * 
+ * TODO add more test cases
  *
  * @author Willi Schoenborn
  */
@@ -72,7 +74,5 @@ public abstract class AbstractSalesforceServiceTest implements UnitProvider<Sale
         soap.logout();
         Assert.assertNotSame(soap, unit.get());
     }
-    
-    // TODO add test cases
 
 }

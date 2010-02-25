@@ -36,26 +36,26 @@ import de.cosmocode.palava.salesforce.SalesforceExecutor;
  *
  * @author Willi Schoenborn
  */
-final class DefaultSalesforceSyncService implements SyncService {
+final class DefaultSyncService implements SyncService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceSyncService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultSyncService.class);
 
     private final ExecutorService service;
     
     @Inject
-    public DefaultSalesforceSyncService(@SalesforceExecutor ExecutorService service) {
+    public DefaultSyncService(@SalesforceExecutor ExecutorService service) {
         this.service = Preconditions.checkNotNull(service, "Service");
     }
     
     @Override
-    public <T extends EntityBase> void execute(SalesforceSyncTask<T> task) {
+    public <T extends EntityBase> void execute(SyncTask<T> task) {
         Preconditions.checkNotNull(task, "Task");
         LOG.trace("Executing {}", task);
         service.execute(task);
     }
 
     @Override
-    public void execute(SalesforceSyncTask<?> first, SalesforceSyncTask<?> second, SalesforceSyncTask<?>... rest) {
+    public void execute(SyncTask<?> first, SyncTask<?> second, SyncTask<?>... rest) {
         final Runnable task = Runnables.chain(first, second, rest);
         LOG.trace("Executing {}", task);
         service.execute(task);

@@ -31,7 +31,8 @@ import de.cosmocode.junit.UnitProvider;
  */
 public abstract class AbstractSyncServiceTest implements UnitProvider<SyncService> {
 
-    /*SyncService SalesforceSyncService#execute(SaSyncServiceth a null task.
+    /**
+     * SyncService SyncService#execute(SaSyncServiceth a null task.
      */
     @Test(expected = NullPointerException.class)
     public void executeNull() {
@@ -39,62 +40,63 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
     }
 
     /**
-     * Tests {@link SalesforceSyncService#execute(SaSyncServiceesforceSyncTask, SyncTask...)} with a null first task.
+     * Tests {@link SyncService#execute(SaSyncServiceesforceSyncTask, SyncTask...)} with a null first task.
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksFirstNull() {
-        final SalesforceSyncTask<?> second = EasyMock.createMock("second", SalesforceSyncTask.class);
-        final SalesforceSyncTask<?>[] rest = new SalesforceSyncTask<?>[0];
+        final SyncTask<?> second = EasyMock.createMock("second", SyncTask.class);
+        final SyncTask<?>[] rest = new SyncTask<?>[0];
         unit().execute(null, second, rest);
     }
 
     /**
-     * Tests {@link SalesforceSyncService#execute(SalesforcSyncServiceSalesforceSyncTask, SalesforceSyncTask...)} with a null second task.
+     * Tests {@link SyncService#execute(SyncTask, SyncTask, SyncTask...)}
+     * with a null second task.
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksSecondNull() {
-        final SalesforceSyncTask<?> first = EasyMock.createMock("first", SalesforceSyncTask.class);
-        final SalesforceSyncTask<?>[] rest = new SalesforceSyncTask<?>[0];
+        final SyncTask<?> first = EasyMock.createMock("first", SyncTask.class);
+        final SyncTask<?>[] rest = new SyncTask<?>[0];
         unit().execute(first, null, rest);
     }
     
     /**
-     * Tests {@link SalesforceSyncService#execute(SalesforceSyncTaSyncServicek, SalesforceSyncTask...)} with a null rest.
+     * Tests {@link SyncService#execute(SyncTask, SyncTask, SyncTask...)} with a null rest.
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksRestNull() {
-        final SalesforceSyncTask<?> first = EasyMock.createMock("first", SalesforceSyncTask.class);
-        final SalesforceSyncTask<?> second = EasyMock.createMock("second", SalesforceSyncTask.class);
-        final SalesforceSyncTask<?>[] rest = null;
+        final SyncTask<?> first = EasyMock.createMock("first", SyncTask.class);
+        final SyncTask<?> second = EasyMock.createMock("second", SyncTask.class);
+        final SyncTask<?>[] rest = null;
         unit().execute(first, second, rest);
     }
 
     /**
-     * Tests {@link SalesforceSyncService#execute(SalesforceSyncTask, SalSyncServicesforceSalesforceSyncTask...)} with a null first and second task.
+     * Tests {@link SyncService#execute(SyncTask, SyncTask, SyncTask...)} with a null first and second task.
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksFirstSecondNull() {
-        final SalesforceSyncTask<?>[] rest = new SalesforceSyncTask<?>[0];
+        final SyncTask<?>[] rest = new SyncTask<?>[0];
         unit().execute(null, null, rest);
     }
     
     /**
-     * Tests {@link SalesforceSyncService#execute(SalesforceSyncTask, SalesforceSyncServiceyncTask...)} with a null first task and null rest.
+     * Tests {@link SyncService#execute(SyncTask, SyncTask, SyncTask...)} with a null first task and null rest.
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksFirstRestNull() {
-        final SalesforceSyncTask<?> second = EasyMock.createMock("second", SalesforceSyncTask.class);
-        final SalesforceSyncTask<?>[] rest = null;
+        final SyncTask<?> second = EasyMock.createMock("second", SyncTask.class);
+        final SyncTask<?>[] rest = null;
         unit().execute(null, second, rest);
     }
     
     /**
-     * Tests {@link SalesforceSyncService#execute(SalesforceSyncTask, SalesforceSyncTasSyncService...)} with a null second task and null rest.
+     * Tests {@link SyncService#execute(SyncTask, SyncTask, SyncTask...)} with a null second task and null rest.
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksSecondRestNull() {
-        final SalesforceSyncTask<?> first = EasyMock.createMock("first", SalesforceSyncTask.class);
-        final SalesforceSyncTask<?>[] rest = null;
+        final SyncTask<?> first = EasyMock.createMock("first", SyncTask.class);
+        final SyncTask<?>[] rest = null;
         unit().execute(first, null, rest);
     }
 

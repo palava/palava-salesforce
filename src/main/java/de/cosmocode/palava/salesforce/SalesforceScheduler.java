@@ -17,35 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.cosmocode.palava.salesforce.sync;
+package de.cosmocode.palava.salesforce;
 
-import de.cosmocode.palava.model.base.EntityBase;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import com.google.inject.BindingAnnotation;
+
+import de.cosmocode.palava.salesforce.sync.SyncService;
 
 /**
- * A service which executes sync tasks. Tasks will be executed
- * in background threads or thread pools.
+ * Used to identify the threadpool for the {@link SyncService}.
  *
  * @author Willi Schoenborn
  */
-public interface SyncService {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({
+    ElementType.PARAMETER,
+    ElementType.FIELD
+})
+@BindingAnnotation
+public @interface SalesforceScheduler {
 
-    /**
-     * Executes a sync task.
-     * 
-     * @param <T> generic entity type
-     * @param task the task being executed
-     * @throws NullPointerException if task is null
-     */
-    <T extends EntityBase> void execute(SyncTask<T> task);
-    
-    /**
-     * Executes the given tasks sequentially.
-     * 
-     * @param first the first task
-     * @param second the second task
-     * @param rest the rest
-     * @throws NullPointerException if first, second or rest is null
-     */
-    void execute(SyncTask<?> first, SyncTask<?> second, SyncTask<?>... rest);
-    
 }

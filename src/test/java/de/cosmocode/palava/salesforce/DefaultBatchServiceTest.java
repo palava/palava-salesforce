@@ -29,7 +29,7 @@ import com.sforce.soap.enterprise.Soap;
  *
  * @author Willi Schoenborn
  */
-public final class DefaultSalesforceBatchServiceTest extends AbstractSalesforceBatchServiceTest {
+public final class DefaultBatchServiceTest extends AbstractBatchServiceTest {
 
     @Override
     public BatchService unit() {

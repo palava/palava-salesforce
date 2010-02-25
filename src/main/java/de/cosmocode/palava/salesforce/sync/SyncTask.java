@@ -27,7 +27,7 @@ import de.cosmocode.palava.model.base.EntityBase;
  * @author Willi Schoenborn
  * @param <T>
  */
-public interface SalesforceSyncTask<T extends EntityBase> extends Runnable {
+public interface SyncTask<T extends EntityBase> extends Runnable {
 
     /**
      * {@inheritDoc}
