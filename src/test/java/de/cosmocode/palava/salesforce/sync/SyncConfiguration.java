@@ -23,7 +23,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import de.cosmocode.palava.concurrent.ExecutorConfig;
-import de.cosmocode.palava.concurrent.ExecutorsConfig;
+import de.cosmocode.palava.concurrent.ExecutorConfigs;
 import de.cosmocode.palava.concurrent.QueueMode;
 import de.cosmocode.palava.core.CoreConfig;
 
@@ -39,7 +39,7 @@ public final class SyncConfiguration {
 
         properties.setProperty(CoreConfig.APPLICATION, SyncTestApplication.class.getName());
         
-        final ExecutorConfig config = ExecutorsConfig.named("salesforce");
+        final ExecutorConfig config = ExecutorConfigs.named("salesforce");
         properties.setProperty(config.minPoolSize(), "10");
         properties.setProperty(config.maxPoolSize(), "100");
         properties.setProperty(config.keepAliveTime(), "10");
