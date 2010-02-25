@@ -22,7 +22,9 @@ package de.cosmocode.palava.salesforce.sync;
 import de.cosmocode.palava.model.base.EntityBase;
 
 /**
- * 
+ * A {@link Runnable} which synchronizes one element of
+ * type T with Salesforce. {@link SyncTask}s are tied to
+ * exactly one instance and should not be reused.
  *
  * @author Willi Schoenborn
  * @param <T>

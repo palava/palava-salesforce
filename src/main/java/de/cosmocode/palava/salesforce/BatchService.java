@@ -21,7 +21,10 @@ package de.cosmocode.palava.salesforce;
 
 import java.util.List;
 
+import com.sforce.soap.enterprise.DeleteResult;
 import com.sforce.soap.enterprise.QueryResult;
+import com.sforce.soap.enterprise.SaveResult;
+import com.sforce.soap.enterprise.UpsertResult;
 import com.sforce.soap.enterprise.sobject.SObject;
 
 import de.cosmocode.palava.core.Service;
@@ -38,96 +41,106 @@ public interface BatchService extends Service {
      * Creates a set of objects in Salesforce.
      * 
      * @param objects the objects being created
+     * @return a list of {@link SaveResult}s
      * @throws NullPointerException if objects is null
      * @throws IllegalArgumentException if objects is empty
      * @throws SalesforceException if creation failed
      */
-    void create(List<SObject> objects);
+    List<SaveResult> create(List<SObject> objects);
     
     /**
      * Creates an object in Salesforce.
      * 
      * @param object the object being created
+     * @return a {@link SaveResult}
      * @throws NullPointerException if objects is null
      * @throws SalesforceException if creation failed
      */
-    void create(SObject object);
+    SaveResult create(SObject object);
 
     /**
      * Updates a set of objects in Salesforce.
      * 
      * @param objects the objects being updated
+     * @return a list of {@link SaveResult}s
      * @throws NullPointerException if objects is null
      * @throws IllegalArgumentException if objects is empty
      * @throws SalesforceException if update failed
      */
-    void update(List<SObject> objects);
+    List<SaveResult> update(List<SObject> objects);
 
     /**
      * Updates an object in Salesforce.
      * 
      * @param object the object being updated
+     * @return a {@link SaveResult}
      * @throws NullPointerException if objects is null
      * @throws SalesforceException if update failed
      */
-    void update(SObject object);
+    SaveResult update(SObject object);
 
     /**
      * Updates/Inserts a set of objects in Salesforce.
      * 
      * @param objects the objects being updated/inserted
+     * @return a list of {@link UpsertResult}s
      * @throws NullPointerException if objects is null
      * @throws IllegalArgumentException if objects is empty
      * @throws SalesforceException if update/insertion failed
      */
-    void upsert(List<SObject> objects);
+    List<UpsertResult> upsert(List<SObject> objects);
 
     /**
      * Updates/Inserts an object in Salesforce.
      * 
      * @param object the object being updated/inserted
+     * @return an {@link UpsertResult}
      * @throws NullPointerException if objects is null
      * @throws SalesforceException if update/insertion failed
      */
-    void upsert(SObject object);
+    UpsertResult upsert(SObject object);
 
     /**
      * Deletes a set of objects in Salesforce.
      * 
      * @param objects the objects being deleted
+     * @return a list of {@link DeleteResult}s
      * @throws NullPointerException if objects is null
      * @throws IllegalArgumentException if objects is empty
      * @throws SalesforceException if deletion failed
      */
-    void delete(List<SObject> objects);
+    List<DeleteResult> delete(List<SObject> objects);
     
     /**
      * Delets a set of objects in Salesforce.
      * 
      * @param identifiers the object identifiers
+     * @return a list of {@link DeleteResult}s
      * @throws NullPointerException if identifiers is null
      * @throws IllegalArgumentException if identifiers is empty
      * @throws SalesforceException if deletion failed
      */
-    void delete(String[] identifiers);
+    List<DeleteResult> delete(String[] identifiers);
 
     /**
      * Deletes an object in Salesforce.
      * 
      * @param object the object being deleted
+     * @return a {@link DeleteResult}
      * @throws NullPointerException if object is null
      * @throws SalesforceException if deletion failed
      */
-    void delete(SObject object);
+    DeleteResult delete(SObject object);
 
     /**
      * Deletes an object in Salesforce.
      * 
      * @param identifier the object's identifier being deleted
+     * @return a {@link DeleteResult}
      * @throws NullPointerException if identifier is null
      * @throws SalesforceException if deletion failed
      */
-    void delete(String identifier);
+    DeleteResult delete(String identifier);
     
 
     /**

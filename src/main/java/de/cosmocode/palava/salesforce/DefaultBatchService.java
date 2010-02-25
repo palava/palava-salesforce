@@ -67,7 +67,7 @@ final class DefaultBatchService implements BatchService {
     }
     
     @Override
-    public void create(List<SObject> objects) {
+    public List<SaveResult> create(List<SObject> objects) {
         Preconditions.checkNotNull(objects, "Objects");
         if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
         final List<SaveResult> results;
@@ -87,6 +87,7 @@ final class DefaultBatchService implements BatchService {
         if (Iterables.all(results, Salesforce.SAVE_SUCCESS)) {
             final String name = objects.get(0).getClass().getSimpleName();
             LOG.info("Successfully created {} {}(s)", results.size(), name);
+            return results;
         } else {
             final Iterable<SaveResult> failures = Iterables.filter(results, Salesforce.SAVE_FAILURE);
             final List<Error> errors = Lists.newArrayList();
@@ -98,12 +99,12 @@ final class DefaultBatchService implements BatchService {
     }
 
     @Override
-    public void create(SObject object) {
-        create(ImmutableList.of(object));
+    public SaveResult create(SObject object) {
+        return create(ImmutableList.of(object)).get(0);
     }
 
     @Override
-    public void update(List<SObject> objects) {
+    public List<SaveResult> update(List<SObject> objects) {
         Preconditions.checkNotNull(objects, "Objects");
         if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
         final List<SaveResult> results;
@@ -123,6 +124,7 @@ final class DefaultBatchService implements BatchService {
         if (Iterables.all(results, Salesforce.SAVE_SUCCESS)) {
             final String name = objects.get(0).getClass().getSimpleName();
             LOG.info("Successfully updated {} {}(s)", results.size(), name);
+            return results;
         } else {
             final Iterable<SaveResult> failures = Iterables.filter(results, Salesforce.SAVE_FAILURE);
             final List<Error> errors = Lists.newArrayList();
@@ -134,13 +136,13 @@ final class DefaultBatchService implements BatchService {
     }
 
     @Override
-    public void update(SObject object) {
-        update(ImmutableList.of(object));
+    public SaveResult update(SObject object) {
+        return update(ImmutableList.of(object)).get(0);
 
     }
 
     @Override
-    public void upsert(List<SObject> objects) {
+    public List<UpsertResult> upsert(List<SObject> objects) {
         Preconditions.checkNotNull(objects, "Objects");
         if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
         final List<UpsertResult> results;
@@ -165,6 +167,7 @@ final class DefaultBatchService implements BatchService {
                 created,
                 name
             });
+            return results;
         } else {
             final Iterable<UpsertResult> failures = Iterables.filter(results, Salesforce.UPSERT_FAILURE);
             final List<Error> errors = Lists.newArrayList();
@@ -176,20 +179,20 @@ final class DefaultBatchService implements BatchService {
     }
 
     @Override
-    public void upsert(SObject object) {
-        upsert(ImmutableList.of(object));
+    public UpsertResult upsert(SObject object) {
+        return upsert(ImmutableList.of(object)).get(0);
     }
 
     @Override
-    public void delete(List<SObject> objects) {
+    public List<DeleteResult> delete(List<SObject> objects) {
         Preconditions.checkNotNull(objects, "Objects");
         if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
         final List<String> identifiers = Lists.newArrayList(Iterables.transform(objects, Salesforce.ID_FUNCTION));
-        delete(identifiers.toArray(new String[identifiers.size()]));
+        return delete(identifiers.toArray(new String[identifiers.size()]));
     }
     
     @Override
-    public void delete(String[] identifiers) {
+    public List<DeleteResult> delete(String[] identifiers) {
         Preconditions.checkNotNull(identifiers, "Identifiers");
         Preconditions.checkArgument(identifiers.length > 0, "Identifiers must not be empty");
         
@@ -203,6 +206,7 @@ final class DefaultBatchService implements BatchService {
 
         if (Iterables.all(results, Salesforce.DELETE_SUCCESS)) {
             LOG.info("Successfully deleted {} objects", results.size());
+            return results;
         } else {
             final Iterable<DeleteResult> failures = Iterables.filter(results, Salesforce.DELETE_FAILURE);
             final List<Error> errors = Lists.newArrayList();
@@ -214,14 +218,14 @@ final class DefaultBatchService implements BatchService {
     }
 
     @Override
-    public void delete(SObject object) {
-        delete(ImmutableList.of(object));
+    public DeleteResult delete(SObject object) {
+        return delete(ImmutableList.of(object)).get(0);
     }
     
     @Override
-    public void delete(String identifier) {
+    public DeleteResult delete(String identifier) {
         Preconditions.checkNotNull(identifier, "Identifier");
-        delete(new String[] {identifier});
+        return delete(new String[] {identifier}).get(0);
     }
     
     @Override
