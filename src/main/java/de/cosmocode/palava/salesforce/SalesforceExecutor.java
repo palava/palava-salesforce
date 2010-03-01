@@ -26,10 +26,8 @@ import java.lang.annotation.Target;
 
 import com.google.inject.BindingAnnotation;
 
-import de.cosmocode.palava.salesforce.sync.SyncService;
-
 /**
- * Used to identify the threadpool for the {@link SyncService}.
+ * Used to identify the threadpool for salesforce background tasks.
  *
  * @author Willi Schoenborn
  */

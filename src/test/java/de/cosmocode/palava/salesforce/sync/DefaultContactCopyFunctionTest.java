@@ -19,22 +19,21 @@
 
 package de.cosmocode.palava.salesforce.sync;
 
-import java.util.concurrent.ExecutorService;
+import com.google.common.base.Function;
+import com.sforce.soap.enterprise.sobject.Contact;
 
-import org.easymock.EasyMock;
+import de.cosmocode.palava.model.business.ContactBase;
 
 /**
- * Tests {@link DefaultSyncService}.
+ * Tests {@link DefaultContactCopyFunction}.
  *
  * @author Willi Schoenborn
  */
-public final class DefaultSyncServiceTest extends AbstractSyncServiceTest {
+public final class DefaultContactCopyFunctionTest extends AbstractContactCopyFunctionTest {
 
     @Override
-    public SyncService unit() {
-        final ExecutorService service = EasyMock.createMock("service", ExecutorService.class);
-        EasyMock.replay(service);
-        return new DefaultSyncService(service);
+    public Function<ContactBase, Contact> unit() {
+        return DefaultContactCopyFunction.getInstance();
     }
 
 }

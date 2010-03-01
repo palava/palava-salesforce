@@ -35,8 +35,8 @@ public final class SyncServiceModule implements Module {
 
     @Override
     public void configure(Binder binder) {
-        binder.install(new ExecutorModule(SalesforceExecutor.class, "salesforce"));
+        binder.install(new ExecutorModule(SalesforceExecutor.class, "salesforce-executor"));
         binder.bind(SyncService.class).to(DefaultSyncService.class).in(Singleton.class);
     }
-
+    
 }

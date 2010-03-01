@@ -17,23 +17,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.cosmocode.palava.salesforce.sync;
+package de.cosmocode.palava.salesforce.stats;
+
+import de.cosmocode.palava.concurrent.ScheduledServiceConfig;
+import de.cosmocode.palava.salesforce.SalesforceConfig;
 
 /**
- * A {@link Runnable} which synchronizes one element of
- * type T with Salesforce. {@link SyncTask}s are tied to
- * exactly one instance and should not be reused.
+ * 
  *
  * @author Willi Schoenborn
  */
-public interface SyncTask extends Runnable {
+public final class StatisticServiceConfig {
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @return a string representation of this task including the entity being sync'd
-     */
-    @Override
-    String toString();
+    public static final String PREFIX = SalesforceConfig.PREFIX + "stats.";
     
+    public static final String DAY = PREFIX + ScheduledServiceConfig.DAY;
+
+    public static final String HOUR = PREFIX + ScheduledServiceConfig.HOUR;
+
+    public static final String MINUTE = PREFIX + ScheduledServiceConfig.MINUTE;
+
+    public static final String PERIOD = PREFIX + ScheduledServiceConfig.PERIOD;
+
+    public static final String PERIOD_UNIT = PREFIX + ScheduledServiceConfig.PERIOD_UNIT;
+    
+    private StatisticServiceConfig() {
+        
+    }
+
 }

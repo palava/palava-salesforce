@@ -20,6 +20,7 @@
 package de.cosmocode.palava.salesforce.sync;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,14 @@ public final class DefaultAccountCopyFunction implements Function<AccountBase, A
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAccountCopyFunction.class);
 
+    private static final UrlValidator URL_VALIDATOR = new UrlValidator();
+    
+    private static final Function<AccountBase, Account> INSTANCE = new DefaultAccountCopyFunction();
+    
+    private DefaultAccountCopyFunction() {
+        
+    }
+    
     @Override
     public Account apply(AccountBase from) {
         final Account to = Salesforce.FACTORY.createAccount();
@@ -118,7 +127,9 @@ public final class DefaultAccountCopyFunction implements Function<AccountBase, A
         final String fax = StringUtils.substring(address.getFax(), 0, 40);
         to.setFax(Salesforce.FACTORY.createAccountFax(fax));
         
-        final String website = StringUtils.substring(address.getWebsite(), 0, 255);
+        String website = address.getWebsite();
+        website = StringUtils.substring(website, 0, 255);
+        website = URL_VALIDATOR.isValid(website) ? website : null;
         to.setWebsite(Salesforce.FACTORY.createAccountWebsite(website));
         
         final String street = Strings.defaultIfBlank(address.getStreet(), "");
@@ -141,6 +152,10 @@ public final class DefaultAccountCopyFunction implements Function<AccountBase, A
         to.setBillingCountry(Salesforce.FACTORY.createAccountBillingCountry(country));
         
         return to;
+    }
+    
+    public static Function<AccountBase, Account> getInstance() {
+        return INSTANCE;
     }
     
 }

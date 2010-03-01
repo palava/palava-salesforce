@@ -20,6 +20,7 @@
 package de.cosmocode.palava.salesforce.sync;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +95,9 @@ import de.cosmocode.palava.salesforce.Salesforce;
  *   </tr>
  * </table>
  * <p>
- *   Note: Invalid values will be trimmed to fit into their corresponding salesforce fields.
- *   This may e.g. result in the postalcode being trimmed to 40 chars.
+ *   Note: Values which exeeds the length limit will be trimmed to fit into their corresponding salesforce fields.
+ *   This may e.g. result in the postalcode being trimmed to 40 chars. Values which do not satisfy their
+ *   corresponding validation rules will be blanked (set to null).
  * </p>
  *
  * @author Willi Schoenborn
@@ -104,6 +106,14 @@ public final class DefaultContactCopyFunction implements Function<ContactBase, C
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultContactCopyFunction.class);
 
+    private static final EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
+    
+    private static final Function<ContactBase, Contact> INSTANCE = new DefaultContactCopyFunction();
+
+    private DefaultContactCopyFunction() {
+        
+    }
+    
     @Override
     public Contact apply(ContactBase from) {
         final Contact to = Salesforce.FACTORY.createContact();
@@ -131,7 +141,9 @@ public final class DefaultContactCopyFunction implements Function<ContactBase, C
         final String fax = StringUtils.substring(address.getFax(), 0, 40);
         to.setFax(Salesforce.FACTORY.createContactFax(fax));
         
-        final String email = StringUtils.substring(address.getEmail(), 0, 80);
+        String email = address.getEmail();
+        email = StringUtils.substring(email, 0, 80);
+        email = EMAIL_VALIDATOR.isValid(email) ? email : null;
         to.setEmail(Salesforce.FACTORY.createContactEmail(email));
 
         final String street = Strings.defaultIfBlank(address.getStreet(), "");
@@ -154,6 +166,10 @@ public final class DefaultContactCopyFunction implements Function<ContactBase, C
         to.setMailingCountry(Salesforce.FACTORY.createContactMailingCountry(country));
         
         return to;
+    }
+    
+    public static Function<ContactBase, Contact> getInstance() {
+        return INSTANCE;
     }
     
 }

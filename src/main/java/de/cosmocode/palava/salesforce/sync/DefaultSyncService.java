@@ -24,41 +24,68 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.sforce.soap.enterprise.sobject.SObject;
 
 import de.cosmocode.palava.concurrent.Runnables;
 import de.cosmocode.palava.model.base.EntityBase;
+import de.cosmocode.palava.salesforce.BatchService;
 import de.cosmocode.palava.salesforce.SalesforceExecutor;
 
 /**
- * Default implementation of the {@link SyncService} interface.
+ * Abstract base implementation of the {@link SyncService} interface.
  *
  * @author Willi Schoenborn
  */
-final class DefaultSyncService implements SyncService {
+public abstract class DefaultSyncService implements SyncService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSyncService.class);
 
     private final ExecutorService service;
     
+    private final BatchService batch;
+    
     @Inject
-    public DefaultSyncService(@SalesforceExecutor ExecutorService service) {
+    public DefaultSyncService(@SalesforceExecutor ExecutorService service, BatchService batch) {
         this.service = Preconditions.checkNotNull(service, "Service");
+        this.batch = Preconditions.checkNotNull(batch, "Batch");
     }
     
     @Override
-    public <T extends EntityBase> void execute(SyncTask<T> task) {
+    public void execute(SyncTask task) {
         Preconditions.checkNotNull(task, "Task");
         LOG.trace("Executing {}", task);
         service.execute(task);
     }
 
     @Override
-    public void execute(SyncTask<?> first, SyncTask<?> second, SyncTask<?>... rest) {
+    public void execute(SyncTask first, SyncTask second, SyncTask... rest) {
         final Runnable task = Runnables.chain(first, second, rest);
         LOG.trace("Executing {}", task);
         service.execute(task);
     }
 
+    @Override
+    public <S extends EntityBase, T extends SObject> void sync(final S from, final Function<S, T> function) {
+        Preconditions.checkNotNull(from, "From");
+        Preconditions.checkNotNull(function, "Function");
+        
+        execute(new SyncTask() {
+            
+            @Override
+            public void run() {
+                final T to = function.apply(from);
+                batch.upsert(to);
+            }
+            
+        });
+    }
+    
+    @Override
+    public void complete() {
+        complete(false);
+    }
+    
 }

@@ -22,7 +22,11 @@ package de.cosmocode.palava.salesforce.sync;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import com.google.common.base.Function;
+import com.sforce.soap.enterprise.sobject.SObject;
+
 import de.cosmocode.junit.UnitProvider;
+import de.cosmocode.palava.model.base.EntityBase;
 
 /**
  * Abstract test suite for {@link SyncService}s.
@@ -44,8 +48,8 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksFirstNull() {
-        final SyncTask<?> second = EasyMock.createMock("second", SyncTask.class);
-        final SyncTask<?>[] rest = new SyncTask<?>[0];
+        final SyncTask second = EasyMock.createMock("second", SyncTask.class);
+        final SyncTask[] rest = new SyncTask[0];
         unit().execute(null, second, rest);
     }
 
@@ -55,8 +59,8 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksSecondNull() {
-        final SyncTask<?> first = EasyMock.createMock("first", SyncTask.class);
-        final SyncTask<?>[] rest = new SyncTask<?>[0];
+        final SyncTask first = EasyMock.createMock("first", SyncTask.class);
+        final SyncTask[] rest = new SyncTask[0];
         unit().execute(first, null, rest);
     }
     
@@ -65,9 +69,9 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksRestNull() {
-        final SyncTask<?> first = EasyMock.createMock("first", SyncTask.class);
-        final SyncTask<?> second = EasyMock.createMock("second", SyncTask.class);
-        final SyncTask<?>[] rest = null;
+        final SyncTask first = EasyMock.createMock("first", SyncTask.class);
+        final SyncTask second = EasyMock.createMock("second", SyncTask.class);
+        final SyncTask[] rest = null;
         unit().execute(first, second, rest);
     }
 
@@ -76,7 +80,7 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksFirstSecondNull() {
-        final SyncTask<?>[] rest = new SyncTask<?>[0];
+        final SyncTask[] rest = new SyncTask[0];
         unit().execute(null, null, rest);
     }
     
@@ -85,8 +89,8 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksFirstRestNull() {
-        final SyncTask<?> second = EasyMock.createMock("second", SyncTask.class);
-        final SyncTask<?>[] rest = null;
+        final SyncTask second = EasyMock.createMock("second", SyncTask.class);
+        final SyncTask[] rest = null;
         unit().execute(null, second, rest);
     }
     
@@ -95,9 +99,38 @@ public abstract class AbstractSyncServiceTest implements UnitProvider<SyncServic
      */
     @Test(expected = NullPointerException.class)
     public void executeTasksSecondRestNull() {
-        final SyncTask<?> first = EasyMock.createMock("first", SyncTask.class);
-        final SyncTask<?>[] rest = null;
+        final SyncTask first = EasyMock.createMock("first", SyncTask.class);
+        final SyncTask[] rest = null;
         unit().execute(first, null, rest);
+    }
+    
+    /**
+     * Tests {@link SyncService#sync(EntityBase, Function)} with a null object.
+     */
+    @Test(expected = NullPointerException.class)
+    public void syncObjectNull() {
+        @SuppressWarnings("unchecked")
+        final Function<EntityBase, SObject> function = EasyMock.createMock("function", Function.class);
+        EasyMock.replay(function);
+        unit().sync(null, function);
+    }
+
+    /**
+     * Tests {@link SyncService#sync(EntityBase, Function)} with a null function.
+     */
+    @Test(expected = NullPointerException.class)
+    public void syncFunctionNull() {
+        final EntityBase object = EasyMock.createMock("object", EntityBase.class);
+        EasyMock.replay(object);
+        unit().sync(object, null);
+    }
+
+    /**
+     * Tests {@link SyncService#sync(EntityBase, Function)} with a null object and a null function.
+     */
+    @Test(expected = NullPointerException.class)
+    public void syncObjectFunctionNull() {
+        unit().sync(null, null);
     }
 
 }

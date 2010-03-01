@@ -39,7 +39,7 @@ public final class SyncConfiguration {
 
         properties.setProperty(CoreConfig.APPLICATION, SyncTestApplication.class.getName());
         
-        final ExecutorConfig config = ExecutorConfigs.named("salesforce");
+        final ExecutorConfig config = ExecutorConfigs.named("salesforce-executor");
         properties.setProperty(config.minPoolSize(), "10");
         properties.setProperty(config.maxPoolSize(), "100");
         properties.setProperty(config.keepAliveTime(), "10");
