@@ -31,7 +31,7 @@ import de.cosmocode.palava.salesforce.SalesforceExecutor;
  *
  * @author Willi Schoenborn
  */
-public final class SyncServiceModule implements Module {
+public final class DefaultSyncServiceModule implements Module {
 
     @Override
     public void configure(Binder binder) {

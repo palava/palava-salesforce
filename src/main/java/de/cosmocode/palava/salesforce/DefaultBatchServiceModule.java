@@ -24,12 +24,11 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 
 /**
- * Binds all default implementations in this package
- * and corresponding providers.
+ * Binds the {@link BatchService} to its default implementation.
  *
  * @author Willi Schoenborn
  */
-public final class BatchServiceModule implements Module {
+public final class DefaultBatchServiceModule implements Module {
 
     @Override
     public void configure(Binder binder) {

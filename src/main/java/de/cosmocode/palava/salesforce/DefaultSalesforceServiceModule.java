@@ -25,12 +25,11 @@ import com.google.inject.Singleton;
 import com.sforce.soap.enterprise.Soap;
 
 /**
- * Binds all default implementations in this package
- * and corresponding providers.
+ * Binds the {@link SalesforceService} to its default implementation.
  *
  * @author Willi Schoenborn
  */
-public final class SalesforceServiceModule implements Module {
+public final class DefaultSalesforceServiceModule implements Module {
 
     @Override
     public void configure(Binder binder) {
