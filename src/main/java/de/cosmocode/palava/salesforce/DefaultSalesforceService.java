@@ -174,7 +174,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
             soap.getServerTimestamp();
             return soap;
         } catch (UnexpectedErrorFault e) {
-            LOG.warn("Soap connection went invalid because of {}", e.getMessage());
+            LOG.info("Soap connection went invalid because of {}", e.getMessage());
             soap = connect();
             return get();
         }

@@ -33,7 +33,6 @@ public final class SyncTestApplication implements Module {
 
     @Override
     public void configure(Binder binder) {
-        binder.install(new DefaultSyncServiceModule());
         binder.install(new RegistryModule());
         final ThreadProvider provider = EasyMock.createMock("provider", ThreadProvider.class);
         EasyMock.expect(provider.newThreadFactory()).andReturn(Executors.defaultThreadFactory());

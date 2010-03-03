@@ -76,8 +76,7 @@ public abstract class DefaultSyncService implements SyncService {
             
             @Override
             public void run() {
-                final T to = function.apply(from);
-                batch.upsert(to);
+                batch.upsert(function.apply(from));
             }
             
         });
