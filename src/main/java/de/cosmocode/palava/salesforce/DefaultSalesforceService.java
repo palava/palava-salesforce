@@ -20,26 +20,42 @@
 package de.cosmocode.palava.salesforce;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.sforce.soap.enterprise.DeleteResult;
+import com.sforce.soap.enterprise.Error;
 import com.sforce.soap.enterprise.GetUserInfoResult;
+import com.sforce.soap.enterprise.InvalidFieldFault;
 import com.sforce.soap.enterprise.InvalidIdFault;
+import com.sforce.soap.enterprise.InvalidQueryLocatorFault;
+import com.sforce.soap.enterprise.InvalidSObjectFault;
 import com.sforce.soap.enterprise.LoginFault;
 import com.sforce.soap.enterprise.LoginResult;
+import com.sforce.soap.enterprise.MalformedQueryFault;
+import com.sforce.soap.enterprise.QueryResult;
+import com.sforce.soap.enterprise.SaveResult;
 import com.sforce.soap.enterprise.SessionHeader;
 import com.sforce.soap.enterprise.SforceService;
 import com.sforce.soap.enterprise.Soap;
 import com.sforce.soap.enterprise.UnexpectedErrorFault;
+import com.sforce.soap.enterprise.UpsertResult;
+import com.sforce.soap.enterprise.sobject.SObject;
 import com.sun.xml.ws.api.message.Header;
 import com.sun.xml.ws.api.message.Headers;
 import com.sun.xml.ws.developer.WSBindingProvider;
@@ -57,6 +73,8 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceService.class);
 
+    private static final int MAX_RETRIES = 1;
+    
     /**
      * The location of the wsdl file.
      */
@@ -91,12 +109,12 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
     
     @Inject
     public DefaultSalesforceService(
-        @Named(SalesforceConfig.WSDL) URL wsdl,
-        @Named(SalesforceConfig.USERNAME) String username,
-        @Named(SalesforceConfig.PASSWORD) String password,
-        @Named(SalesforceConfig.SECURITY_TOKEN) String securityToken,
-        @Named(SalesforceConfig.CONNECTION_TIMEOUT) long connectionTimeout,
-        @Named(SalesforceConfig.CONNECTION_TIMEOUT_UNIT) TimeUnit connectionTimeoutUnit) {
+        @Named(SalesforceServiceConfig.WSDL) URL wsdl,
+        @Named(SalesforceServiceConfig.USERNAME) String username,
+        @Named(SalesforceServiceConfig.PASSWORD) String password,
+        @Named(SalesforceServiceConfig.SECURITY_TOKEN) String securityToken,
+        @Named(SalesforceServiceConfig.CONNECTION_TIMEOUT) long connectionTimeout,
+        @Named(SalesforceServiceConfig.CONNECTION_TIMEOUT_UNIT) TimeUnit connectionTimeoutUnit) {
         
         this.wsdl = Preconditions.checkNotNull(wsdl, "Wsdl");
         this.username = Preconditions.checkNotNull(username, "Username");
@@ -120,6 +138,9 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         LOG.info("Connecting to Salesforce using {}", wsdl.toExternalForm());
         final SforceService service = new SforceService(wsdl, Salesforce.SERVICE_NAME);
         final Soap endpoint = service.getSoap();
+        
+        assert endpoint instanceof WSBindingProvider : 
+            String.format("%s should be an instance of %s", endpoint, WSBindingProvider.class);
         
         final WSBindingProvider provider = WSBindingProvider.class.cast(endpoint);
         final Object address = provider.getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
@@ -170,13 +191,242 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
     
     @Override
     public synchronized Soap get() {
+        return soap;
+    }
+    
+    @Override
+    public synchronized Soap reconnect() {
+        soap = connect();
+        return soap;
+    }
+    
+    @Override
+    public List<SaveResult> create(List<SObject> objects) {
+        return create(objects, 0);
+    }
+    
+    private List<SaveResult> create(List<SObject> objects, int retries) {
+        Preconditions.checkNotNull(objects, "Objects");
+        if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
+        final List<SaveResult> results;
+        
         try {
-            soap.getServerTimestamp();
-            return soap;
+            results = get().create(objects);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidIdFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidSObjectFault e) {
+            throw new SalesforceException(e);
         } catch (UnexpectedErrorFault e) {
-            LOG.info("Soap connection went invalid because of {}", e.getMessage());
-            soap = connect();
-            return get();
+            if (retries < MAX_RETRIES) {
+                reconnect();
+                return create(objects, retries + 1);
+            } else {
+                throw new SalesforceException(e);
+            }
+        }
+        
+        if (Iterables.all(results, Salesforce.SAVE_SUCCESS)) {
+            final String name = objects.get(0).getClass().getSimpleName();
+            LOG.info("Successfully created {} {}(s)", results.size(), name);
+            return results;
+        } else {
+            final Iterable<SaveResult> failures = Iterables.filter(results, Salesforce.SAVE_FAILURE);
+            final List<Error> errors = Lists.newArrayList();
+            for (SaveResult failure : failures) {
+                errors.addAll(failure.getErrors());
+            }
+            throw new SalesforceException(errors);
+        }
+    }
+
+    @Override
+    public SaveResult create(SObject object) {
+        return create(ImmutableList.of(object)).get(0);
+    }
+
+    @Override
+    public List<SaveResult> update(List<SObject> objects) {
+        return update(objects, 0);
+    }
+    
+    private List<SaveResult> update(List<SObject> objects, int retries) {
+        Preconditions.checkNotNull(objects, "Objects");
+        if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
+        final List<SaveResult> results;
+        
+        try {
+            results = get().update(objects);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidIdFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidSObjectFault e) {
+            throw new SalesforceException(e);
+        } catch (UnexpectedErrorFault e) {
+            if (retries < MAX_RETRIES) {
+                reconnect();
+                return update(objects, retries + 1);
+            } else {
+                throw new SalesforceException(e);
+            }
+        }
+        
+        if (Iterables.all(results, Salesforce.SAVE_SUCCESS)) {
+            final String name = objects.get(0).getClass().getSimpleName();
+            LOG.info("Successfully updated {} {}(s)", results.size(), name);
+            return results;
+        } else {
+            final Iterable<SaveResult> failures = Iterables.filter(results, Salesforce.SAVE_FAILURE);
+            final List<Error> errors = Lists.newArrayList();
+            for (SaveResult failure : failures) {
+                errors.addAll(failure.getErrors());
+            }
+            throw new SalesforceException(errors);
+        }
+    }
+
+    @Override
+    public SaveResult update(SObject object) {
+        return update(ImmutableList.of(object)).get(0);
+
+    }
+
+    @Override
+    public List<UpsertResult> upsert(List<SObject> objects) {
+        return upsert(objects, 0);
+    }
+    
+    private List<UpsertResult> upsert(List<SObject> objects, int retries) {
+        Preconditions.checkNotNull(objects, "Objects");
+        if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
+        final List<UpsertResult> results;
+        
+        try {
+            results = get().upsert(Salesforce.EXTERNAL_IDENTIFIER, objects);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidIdFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidSObjectFault e) {
+            throw new SalesforceException(e);
+        } catch (UnexpectedErrorFault e) {
+            if (retries < MAX_RETRIES) {
+                reconnect();
+                return upsert(objects, retries + 1);
+            } else {
+                throw new SalesforceException(e);
+            }
+        }
+
+        if (Iterables.all(results, Salesforce.UPSERT_SUCCESS)) {
+            final String name = objects.get(0).getClass().getSimpleName();
+            final int created = Iterables.size(Iterables.filter(results, Salesforce.CREATED_VIA_UPSERT));
+            LOG.info("Successfully updated {} and created {} {}(s)", new Object[] {
+                results.size() - created,
+                created,
+                name
+            });
+            return results;
+        } else {
+            final Iterable<UpsertResult> failures = Iterables.filter(results, Salesforce.UPSERT_FAILURE);
+            final List<Error> errors = Lists.newArrayList();
+            for (UpsertResult failure : failures) {
+                errors.addAll(failure.getErrors());
+            }
+            throw new SalesforceException(errors);
+        }
+    }
+
+    @Override
+    public UpsertResult upsert(SObject object) {
+        return upsert(ImmutableList.of(object)).get(0);
+    }
+
+    @Override
+    public List<DeleteResult> delete(List<SObject> objects) {
+        Preconditions.checkNotNull(objects, "Objects");
+        if (objects.isEmpty()) throw new IllegalArgumentException("Objects must not be empty");
+        final List<String> identifiers = Lists.newArrayList(Iterables.transform(objects, Salesforce.ID_FUNCTION));
+        return delete(identifiers.toArray(new String[identifiers.size()]));
+    }
+    
+    @Override
+    public List<DeleteResult> delete(String[] identifiers) {
+        return delete(identifiers, 0);
+    }
+    
+    private List<DeleteResult> delete(String[] identifiers, int retries) {
+        Preconditions.checkNotNull(identifiers, "Identifiers");
+        Preconditions.checkArgument(identifiers.length > 0, "Identifiers must not be empty");
+        
+        final List<DeleteResult> results;
+        
+        try {
+            results = get().delete(Arrays.asList(identifiers));
+        } catch (UnexpectedErrorFault e) {
+            if (retries < MAX_RETRIES) {
+                reconnect();
+                return delete(identifiers, retries + 1);
+            } else {
+                throw new SalesforceException(e);
+            }
+        }
+
+        if (Iterables.all(results, Salesforce.DELETE_SUCCESS)) {
+            LOG.info("Successfully deleted {} objects", results.size());
+            return results;
+        } else {
+            final Iterable<DeleteResult> failures = Iterables.filter(results, Salesforce.DELETE_FAILURE);
+            final List<Error> errors = Lists.newArrayList();
+            for (DeleteResult failure : failures) {
+                errors.addAll(failure.getErrors());
+            }
+            throw new SalesforceException(errors);
+        }
+    }
+
+    @Override
+    public DeleteResult delete(SObject object) {
+        return delete(ImmutableList.of(object)).get(0);
+    }
+    
+    @Override
+    public DeleteResult delete(String identifier) {
+        Preconditions.checkNotNull(identifier, "Identifier");
+        return delete(new String[] {identifier}).get(0);
+    }
+    
+    @Override
+    public QueryResult execute(String query) {
+        return execute(query, 0);
+    }
+    
+    private QueryResult execute(String query, int retries) {
+        Preconditions.checkNotNull(query, "Query");
+        Preconditions.checkArgument(StringUtils.isNotBlank(query), "Query must not be blank");
+        
+        try {
+            LOG.debug("Executing query '{}' against Salesforce", query);
+            return get().query(query);
+        } catch (InvalidFieldFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidIdFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidQueryLocatorFault e) {
+            throw new SalesforceException(e);
+        } catch (InvalidSObjectFault e) {
+            throw new SalesforceException(e);
+        } catch (MalformedQueryFault e) {
+            throw new SalesforceException(e);
+        } catch (UnexpectedErrorFault e) {
+            if (retries < MAX_RETRIES) {
+                reconnect();
+                return execute(query, retries + 1);
+            } else {
+                throw new SalesforceException(e);
+            }
         }
     }
     

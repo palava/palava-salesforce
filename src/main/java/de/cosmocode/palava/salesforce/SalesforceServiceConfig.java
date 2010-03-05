@@ -17,23 +17,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package de.cosmocode.palava.salesforce.sync;
-
-import com.google.common.base.Function;
-import com.sforce.soap.enterprise.sobject.Contact;
-
-import de.cosmocode.palava.model.business.ContactBase;
+package de.cosmocode.palava.salesforce;
 
 /**
- * Tests {@link DefaultContactCopyFunction}.
+ * Static constant holder class for salesforce config key names.
  *
  * @author Willi Schoenborn
  */
-public final class DefaultContactCopyFunctionTest extends AbstractContactCopyFunctionTest {
+public final class SalesforceServiceConfig {
 
-    @Override
-    public Function<ContactBase, Contact> unit() {
-        return DefaultContactCopyFunction.getInstance();
+    public static final String PREFIX = "salesforce.";
+    
+    public static final String WSDL = PREFIX + "wsdl";
+    
+    public static final String USERNAME = PREFIX + "username";
+    
+    public static final String PASSWORD = PREFIX + "password";
+    
+    public static final String SECURITY_TOKEN = PREFIX + "securityToken";
+    
+    public static final String CONNECTION_TIMEOUT = PREFIX + "connectionTimeout";
+    
+    public static final String CONNECTION_TIMEOUT_UNIT = PREFIX + "connectionTimeoutUnit";
+    
+    private SalesforceServiceConfig() {
+        
     }
 
 }

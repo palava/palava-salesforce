@@ -31,8 +31,8 @@ import com.sforce.soap.enterprise.sobject.SObject;
 
 import de.cosmocode.palava.concurrent.Runnables;
 import de.cosmocode.palava.model.base.EntityBase;
-import de.cosmocode.palava.salesforce.BatchService;
 import de.cosmocode.palava.salesforce.SalesforceExecutor;
+import de.cosmocode.palava.salesforce.SalesforceService;
 
 /**
  * Abstract base implementation of the {@link SyncService} interface.
@@ -45,12 +45,12 @@ public abstract class DefaultSyncService implements SyncService {
 
     private final ExecutorService service;
     
-    private final BatchService batch;
+    private final SalesforceService salesforce;
     
     @Inject
-    public DefaultSyncService(@SalesforceExecutor ExecutorService service, BatchService batch) {
+    public DefaultSyncService(@SalesforceExecutor ExecutorService service, SalesforceService salesforce) {
         this.service = Preconditions.checkNotNull(service, "Service");
-        this.batch = Preconditions.checkNotNull(batch, "Batch");
+        this.salesforce = Preconditions.checkNotNull(salesforce, "Salesforce");
     }
     
     @Override
@@ -76,7 +76,7 @@ public abstract class DefaultSyncService implements SyncService {
             
             @Override
             public void run() {
-                batch.upsert(function.apply(from));
+                salesforce.upsert(function.apply(from));
             }
             
         });

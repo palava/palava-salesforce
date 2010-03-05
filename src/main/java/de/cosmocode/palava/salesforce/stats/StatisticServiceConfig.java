@@ -20,16 +20,22 @@
 package de.cosmocode.palava.salesforce.stats;
 
 import de.cosmocode.palava.concurrent.ScheduledServiceConfig;
-import de.cosmocode.palava.salesforce.SalesforceConfig;
+import de.cosmocode.palava.salesforce.SalesforceServiceConfig;
 
 /**
- * 
+ * Static constant holder class for salesforce statistic config key names.
  *
  * @author Willi Schoenborn
  */
 public final class StatisticServiceConfig {
 
-    public static final String PREFIX = SalesforceConfig.PREFIX + "stats.";
+    public static final String PREFIX = SalesforceServiceConfig.PREFIX + "stats.";
+    
+    public static final String AUTOSTART = PREFIX + ScheduledServiceConfig.AUTOSTART;
+    
+    public static final String MONTH = PREFIX + ScheduledServiceConfig.MONTH;
+    
+    public static final String WEEK = PREFIX + ScheduledServiceConfig.WEEK;
     
     public static final String DAY = PREFIX + ScheduledServiceConfig.DAY;
 

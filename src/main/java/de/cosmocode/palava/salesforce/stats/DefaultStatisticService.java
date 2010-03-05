@@ -33,7 +33,7 @@ import de.cosmocode.palava.concurrent.ScheduledService;
 import de.cosmocode.palava.salesforce.SalesforceScheduler;
 
 /**
- * 
+ * Dummy statistic service which uses a {@link ScheduledService}.
  *
  * @author Willi Schoenborn
  */
@@ -46,6 +46,24 @@ final class DefaultStatisticService extends ScheduledService {
     @Inject
     public DefaultStatisticService(@SalesforceScheduler ScheduledExecutorService scheduler) {
         this.scheduler = Preconditions.checkNotNull(scheduler, "Scheduler");
+    }
+
+    @Inject(optional = true)
+    @Override
+    protected void setAutostart(@Named(StatisticServiceConfig.AUTOSTART) boolean autostart) {
+        super.setAutostart(autostart);
+    }
+
+    @Inject(optional = true)
+    @Override
+    protected void setMonth(@Named(StatisticServiceConfig.MONTH) int month) {
+        super.setMonth(month);
+    }
+
+    @Inject(optional = true)
+    @Override
+    protected void setWeek(@Named(StatisticServiceConfig.WEEK) int week) {
+        super.setWeek(week);
     }
 
     @Inject
