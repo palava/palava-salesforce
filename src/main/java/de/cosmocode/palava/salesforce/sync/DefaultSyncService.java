@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.sforce.soap.enterprise.sobject.SObject;
 
-import de.cosmocode.palava.concurrent.Runnables;
+import de.cosmocode.commons.concurrent.Runnables;
 import de.cosmocode.palava.model.base.EntityBase;
 import de.cosmocode.palava.salesforce.SalesforceExecutor;
 import de.cosmocode.palava.salesforce.SalesforceService;
