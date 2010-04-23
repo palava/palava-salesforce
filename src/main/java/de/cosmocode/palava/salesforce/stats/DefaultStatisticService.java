@@ -19,96 +19,21 @@
 
 package de.cosmocode.palava.salesforce.stats;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-import de.cosmocode.palava.concurrent.ScheduledService;
-import de.cosmocode.palava.salesforce.SalesforceScheduler;
 
 /**
  * Dummy statistic service which uses a {@link ScheduledService}.
  *
  * @author Willi Schoenborn
  */
-final class DefaultStatisticService extends ScheduledService {
+final class DefaultStatisticService implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultStatisticService.class);
 
-    private final ScheduledExecutorService scheduler;
-    
-    @Inject
-    public DefaultStatisticService(@SalesforceScheduler ScheduledExecutorService scheduler) {
-        this.scheduler = Preconditions.checkNotNull(scheduler, "Scheduler");
-    }
-
-    @Inject(optional = true)
-    @Override
-    protected void setAutostart(@Named(StatisticServiceConfig.AUTOSTART) boolean autostart) {
-        super.setAutostart(autostart);
-    }
-
-    @Inject(optional = true)
-    @Override
-    protected void setMonth(@Named(StatisticServiceConfig.MONTH) int month) {
-        super.setMonth(month);
-    }
-
-    @Inject(optional = true)
-    @Override
-    protected void setWeek(@Named(StatisticServiceConfig.WEEK) int week) {
-        super.setWeek(week);
-    }
-
-    @Inject
-    @Override
-    protected void setDay(@Named(StatisticServiceConfig.DAY) int day) {
-        super.setDay(day);
-    }
-    
-    @Inject
-    @Override
-    protected void setHour(@Named(StatisticServiceConfig.HOUR) int hour) {
-        super.setHour(hour);
-    }
-
-    @Inject(optional = true)
-    @Override
-    protected void setMinute(@Named(StatisticServiceConfig.MINUTE) int minute) {
-        super.setMinute(minute);
-    }
-
-    @Inject
-    @Override
-    protected void setPeriod(@Named(StatisticServiceConfig.PERIOD) long period) {
-        super.setPeriod(period);
-    }
-
-    @Inject
-    @Override
-    protected void setPeriodUnit(@Named(StatisticServiceConfig.PERIOD_UNIT) TimeUnit periodUnit) {
-        super.setPeriodUnit(periodUnit);
-    }
-    
-    @Override
-    protected ScheduledExecutorService getScheduler() {
-        return scheduler;
-    }
-    
     @Override
     public void run() {
         // do work here
-    }
-    
-    @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        LOG.error("Uncaught exception in " + t, e);
     }
     
 }
