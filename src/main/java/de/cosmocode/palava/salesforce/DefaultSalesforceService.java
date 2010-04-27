@@ -73,8 +73,6 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSalesforceService.class);
 
-    private static final int MAX_RETRIES = 1;
-    
     /**
      * The location of the wsdl file.
      */
@@ -105,6 +103,10 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
      */
     private final TimeUnit connectionTimeoutUnit;
     
+    private int maxRetries = 1;
+    
+    private boolean failOnBoot = true;
+    
     private Soap soap;
     
     @Inject
@@ -123,13 +125,27 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         this.connectionTimeout = Preconditions.checkNotNull(connectionTimeout, "ConnectionTimeout");
         this.connectionTimeoutUnit = Preconditions.checkNotNull(connectionTimeoutUnit, "ConnectionTimeoutUnit");
     }
+    
+    @Inject(optional = true)
+    void setMaxRetries(@Named(SalesforceServiceConfig.MAX_RETRIES) int maxRetries) {
+        this.maxRetries = maxRetries;
+    }
+    
+    @Inject(optional = true)
+    void setFailOnBoot(@Named(SalesforceServiceConfig.FAIL_ON_BOOT) boolean failOnBoot) {
+        this.failOnBoot = failOnBoot;
+    }
 
     @Override
     public void initialize() throws LifecycleException {
         try {
             soap = connect();
         } catch (SalesforceException e) {
-            throw new LifecycleException(e);
+            if (failOnBoot) {
+                throw new LifecycleException(e);
+            } else {
+                LOG.warn("Unable to connect to salesforce", e);
+            }
         }
     }
     
@@ -219,7 +235,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         } catch (InvalidSObjectFault e) {
             throw new SalesforceException(e);
         } catch (UnexpectedErrorFault e) {
-            if (retries < MAX_RETRIES) {
+            if (retries < maxRetries) {
                 reconnect();
                 return create(objects, retries + 1);
             } else {
@@ -265,7 +281,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         } catch (InvalidSObjectFault e) {
             throw new SalesforceException(e);
         } catch (UnexpectedErrorFault e) {
-            if (retries < MAX_RETRIES) {
+            if (retries < maxRetries) {
                 reconnect();
                 return update(objects, retries + 1);
             } else {
@@ -312,7 +328,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         } catch (InvalidSObjectFault e) {
             throw new SalesforceException(e);
         } catch (UnexpectedErrorFault e) {
-            if (retries < MAX_RETRIES) {
+            if (retries < maxRetries) {
                 reconnect();
                 return upsert(objects, retries + 1);
             } else {
@@ -366,7 +382,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         try {
             results = get().delete(Arrays.asList(identifiers));
         } catch (UnexpectedErrorFault e) {
-            if (retries < MAX_RETRIES) {
+            if (retries < maxRetries) {
                 reconnect();
                 return delete(identifiers, retries + 1);
             } else {
@@ -421,7 +437,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         } catch (MalformedQueryFault e) {
             throw new SalesforceException(e);
         } catch (UnexpectedErrorFault e) {
-            if (retries < MAX_RETRIES) {
+            if (retries < maxRetries) {
                 reconnect();
                 return execute(query, retries + 1);
             } else {
