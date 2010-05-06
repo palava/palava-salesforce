@@ -103,8 +103,20 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
      */
     private final TimeUnit connectionTimeoutUnit;
     
+    /**
+     * Name of the external identifier field used for {@link Soap#upsert(String, List)} calls.
+     */
+    private String externalIdentifier = "ObjectId__c";
+    
+    /**
+     * Number of retries all crud operations will perform before failing.
+     */
     private int maxRetries = 1;
     
+    /**
+     * When set to true a failure connection failure during initialization will result
+     * in an exception.
+     */
     private boolean failOnBoot = true;
     
     private Soap soap;
@@ -124,6 +136,11 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         this.securityToken = Preconditions.checkNotNull(securityToken, "SecurityToken");
         this.connectionTimeout = Preconditions.checkNotNull(connectionTimeout, "ConnectionTimeout");
         this.connectionTimeoutUnit = Preconditions.checkNotNull(connectionTimeoutUnit, "ConnectionTimeoutUnit");
+    }
+    
+    @Inject(optional = true)
+    void setExternalIdentifier(@Named(SalesforceServiceConfig.EXTERNAL_IDENTIFIER) String externalIdentifier) {
+        this.externalIdentifier = Preconditions.checkNotNull(externalIdentifier, "ExternalIdentifier");
     }
     
     @Inject(optional = true)
@@ -306,7 +323,6 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
     @Override
     public SaveResult update(SObject object) {
         return update(ImmutableList.of(object)).get(0);
-
     }
 
     @Override
@@ -320,7 +336,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         final List<UpsertResult> results;
         
         try {
-            results = get().upsert(Salesforce.EXTERNAL_IDENTIFIER, objects);
+            results = get().upsert(externalIdentifier, objects);
         } catch (InvalidFieldFault e) {
             throw new SalesforceException(e);
         } catch (InvalidIdFault e) {
@@ -340,9 +356,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
             final String name = objects.get(0).getClass().getSimpleName();
             final int created = Iterables.size(Iterables.filter(results, Salesforce.CREATED_VIA_UPSERT));
             LOG.info("Successfully updated {} and created {} {}(s)", new Object[] {
-                results.size() - created,
-                created,
-                name
+                results.size() - created, created, name
             });
             return results;
         } else {

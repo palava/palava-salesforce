@@ -40,6 +40,8 @@ public final class SalesforceServiceConfig {
     
     public static final String CONNECTION_TIMEOUT_UNIT = PREFIX + "connectionTimeoutUnit";
     
+    public static final String EXTERNAL_IDENTIFIER = PREFIX + "externalIdentifier";
+    
     public static final String MAX_RETRIES = PREFIX + "maxRetries";
     
     public static final String FAIL_ON_BOOT = PREFIX + "failOnBoot";

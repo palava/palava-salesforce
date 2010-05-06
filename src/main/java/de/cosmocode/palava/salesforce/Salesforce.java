@@ -49,8 +49,6 @@ import de.cosmocode.commons.Calendars;
  */
 public final class Salesforce {
     
-    public static final String EXTERNAL_IDENTIFIER = "ObjectId__c";
-
     public static final int MAXIMUM_BATCH_SIZE = 200;
     
     public static final ObjectFactory FACTORY = new ObjectFactory();
@@ -108,12 +106,15 @@ public final class Salesforce {
 
     public static final QName SERVICE_NAME = new QName("urn:enterprise.soap.sforce.com", "SforceService");
     
-    public static final ImmutableList<String> GZIP = ImmutableList.of("gzip");
+    public static final ImmutableMap<String, ImmutableList<String>> HTTP_HEADERS;
     
-    public static final ImmutableMap<String, ImmutableList<String>> HTTP_HEADERS = ImmutableMap.of(
-        "Content-Encoding", GZIP,
-        "Accept-Encoding", GZIP
-    );
+    static {
+        final ImmutableList<String> gzip = ImmutableList.of("gzip");
+        HTTP_HEADERS = ImmutableMap.of(
+            "Content-Encoding", gzip,
+            "Accept-Encoding", gzip
+        );
+    }
 
     public static final JAXBRIContext CONTEXT;
     
