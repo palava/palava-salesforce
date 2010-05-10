@@ -179,12 +179,12 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
         final Object address = provider.getRequestContext().get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
         LOG.debug("Connecting to {}", address);
         
-        LOG.debug("Setting connection timeout to {} {}", 
+        LOG.trace("Setting connection timeout to {} {}", 
             connectionTimeout, connectionTimeoutUnit.name().toLowerCase());
         final int timeout = (int) connectionTimeoutUnit.toMillis(connectionTimeout);
         provider.getRequestContext().put("com.sun.xml.ws.request.timeout", timeout);
         
-        LOG.debug("Enabling Gzip compression");
+        LOG.trace("Enabling Gzip compression");
         provider.getRequestContext().put(MessageContext.HTTP_REQUEST_HEADERS, Maps.newHashMap(Salesforce.HTTP_HEADERS));
         
         try {
@@ -192,25 +192,25 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
             final LoginResult result = endpoint.login(username, password + securityToken);
             
             final String serverUrl = result.getServerUrl();
-            LOG.debug("Setting endpoint to {}", serverUrl);
+            LOG.trace("Setting endpoint to {}", serverUrl);
             provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serverUrl);
             
             final SessionHeader sessionHeader = new SessionHeader();
-            LOG.debug("Creating new SessionHeader with Id: {}", result.getSessionId());
+            LOG.trace("Creating new SessionHeader with Id: {}", result.getSessionId());
             sessionHeader.setSessionId(result.getSessionId());
             
             final Header header = Headers.create(Salesforce.CONTEXT, sessionHeader);
-            LOG.debug("Setting Header {} in provider {}", header, provider);
+            LOG.trace("Setting Header {} in provider {}", header, provider);
             provider.setOutboundHeaders(header);
             
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Logged in as user with ID {}", result.getUserId());
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Logged in as user with ID {}", result.getUserId());
                 
                 final GetUserInfoResult info = result.getUserInfo();
-                LOG.debug("Username: {} ({})", info.getUserFullName(), info.getUserName());
-                LOG.debug("Email: {}", info.getUserEmail());
-                LOG.debug("Organization: {} [{}]", info.getOrganizationName(), info.getOrganizationId());
-                LOG.debug("Language: {} / Locale: {}", info.getUserLanguage(), info.getUserLocale());
+                LOG.trace("Username: {} ({})", info.getUserFullName(), info.getUserName());
+                LOG.trace("Email: {}", info.getUserEmail());
+                LOG.trace("Organization: {} [{}]", info.getOrganizationName(), info.getOrganizationId());
+                LOG.trace("Language: {} / Locale: {}", info.getUserLanguage(), info.getUserLocale());
             }
         } catch (InvalidIdFault e) {
             throw new SalesforceException("Unable to log into Salesforce", e);

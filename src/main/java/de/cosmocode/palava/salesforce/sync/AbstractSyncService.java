@@ -26,12 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
 import com.sforce.soap.enterprise.sobject.SObject;
 
 import de.cosmocode.commons.concurrent.Runnables;
 import de.cosmocode.palava.model.base.EntityBase;
-import de.cosmocode.palava.salesforce.SalesforceExecutor;
 import de.cosmocode.palava.salesforce.SalesforceService;
 
 /**
@@ -39,32 +37,38 @@ import de.cosmocode.palava.salesforce.SalesforceService;
  *
  * @author Willi Schoenborn
  */
-public abstract class DefaultSyncService implements SyncService {
+public abstract class AbstractSyncService implements SyncService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSyncService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractSyncService.class);
 
-    private final ExecutorService service;
+    /**
+     * Retrieves the associated {@link SalesforceService}.
+     * 
+     * @since 1.0
+     * @return the salesforce service
+     */
+    protected abstract SalesforceService getService();
     
-    private final SalesforceService salesforce;
-    
-    @Inject
-    public DefaultSyncService(@SalesforceExecutor ExecutorService service, SalesforceService salesforce) {
-        this.service = Preconditions.checkNotNull(service, "Service");
-        this.salesforce = Preconditions.checkNotNull(salesforce, "Salesforce");
-    }
+    /**
+     * Retrieves the associated {@link ExecutorService}.
+     * 
+     * @since 1.0
+     * @return the executor
+     */
+    protected abstract ExecutorService getExecutor();
     
     @Override
     public void execute(SyncTask task) {
         Preconditions.checkNotNull(task, "Task");
         LOG.trace("Executing {}", task);
-        service.execute(task);
+        getExecutor().execute(task);
     }
 
     @Override
     public void execute(SyncTask first, SyncTask second, SyncTask... rest) {
         final Runnable task = Runnables.chain(first, second, rest);
         LOG.trace("Executing {}", task);
-        service.execute(task);
+        getExecutor().execute(task);
     }
 
     @Override
@@ -76,7 +80,7 @@ public abstract class DefaultSyncService implements SyncService {
             
             @Override
             public void run() {
-                salesforce.upsert(function.apply(from));
+                getService().upsert(function.apply(from));
             }
             
         });
