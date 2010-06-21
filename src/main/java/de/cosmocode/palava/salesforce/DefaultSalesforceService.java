@@ -221,7 +221,7 @@ final class DefaultSalesforceService implements SalesforceService, Initializable
     
     @Override
     public synchronized Soap get() {
-        return soap;
+        return soap == null ? reconnect() : soap;
     }
     
     @Override
