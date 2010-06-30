@@ -18,6 +18,7 @@ package de.cosmocode.palava.salesforce.sync;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
