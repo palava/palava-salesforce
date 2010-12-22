@@ -58,6 +58,7 @@ public interface SalesforceService extends Provider<Soap> {
      * 
      * @return a Soap instance
      */
+    @Override
     Soap get();
 
     /**
